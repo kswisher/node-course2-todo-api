@@ -11,7 +11,9 @@ const todos = [{
   text: 'First test todo'
 }, {
   _id: new ObjectID(),
-  text: 'Second test todo'
+  text: 'Second test todo',
+  completed: true,
+  completedAt: 333
 }];
 
 // clear the database before any testing
@@ -138,4 +140,51 @@ describe('DELETE /todos/:id', () => {
         .expect(400)
         .end(done);
     });
+});
+
+describe('PATCH /todos/:id', () => {
+  it('should update the todo', (done) => {
+    // brab id of first item
+    // update the text, set completeed to true
+    // assert that we get 200
+    // text is changed
+    // completed is true
+    // completedAt is a Number
+    var id = todos[0]._id.toHexString();
+    var updTodo1 = {
+      text: 'Updated text from mocha test',
+      completed: true
+    };
+    request(app)
+      .patch(`/todos/${id}`)
+      .send(updTodo1)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(updTodo1.text);
+        expect(res.body.todo.completed).toBe(true);
+      })
+      .end(done);
+  });
+
+  it('should clear completedAt when todo is not completed', (done) => {
+    // grab id of secnod item
+    // update text, set completed to false
+    // 200
+    // text is changed, completed false, campletedat is false
+    var id = todos[1]._id.toHexString();
+    var updTodo1 = {
+      text: 'Updated text from mocha test2',
+      completed: false
+    };
+    request(app)
+      .patch(`/todos/${id}`)
+      .send(updTodo1)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(updTodo1.text);
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completedAt).toBe(null);
+      })
+      .end(done);
+  });
 });
